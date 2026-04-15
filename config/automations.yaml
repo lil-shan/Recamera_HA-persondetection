@@ -1,0 +1,33 @@
+- id: '1776174048516'
+  alias: reCamera Person Count Update
+  triggers:
+  - topic: recamera/people
+    trigger: mqtt
+  actions:
+  - target:
+      entity_id: input_number.recamera_people_count
+    data:
+      value: '{{ trigger.payload | float(0) }}'
+    action: input_number.set_value
+  mode: single
+
+- id: '1776243900001'
+  alias: reCamera Snapshot to Telegram
+  triggers:
+  - topic: recamera/people
+    trigger: mqtt
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload | int(0) > 0 }}'
+  actions:
+  - delay:
+      seconds: 1
+  - action: telegram_bot.send_photo
+    data:
+      caption: "Screenshot Total visitors: {{ trigger.payload | int }}"
+      chat_id: "<your_chatID>"
+      url: "http://192.168.42.1:1880/snapshot"
+  - delay:
+      minutes: 1
+  mode: single
+
